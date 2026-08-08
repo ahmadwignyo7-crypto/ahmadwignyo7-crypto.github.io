@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absen Kehadiran</title>
+    <title>AbsenKu — Rekap Kehadiran</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -11,58 +11,171 @@
     <style>
         :root {
             --grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            --accent: #8b5cf6;
+            --bg: #f1f2f8;
+            --surface: #ffffff;
+            --surface-2: #f7f8fd;
+            --border: #e6e9f2;
+            --text: #0f172a;
+            --text-2: #5b6272;
+            --soft: rgba(139, 92, 246, .10);
+            --soft-text: #7c3aed;
+            --glass-nav: rgba(255, 255, 255, .72);
+            --shadow: 0 10px 30px rgba(31, 35, 65, .08);
+        }
+        [data-theme="dark"] {
+            --bg: #0a0f1e;
+            --surface: #121a2e;
+            --surface-2: #1a243d;
+            --border: #243049;
+            --text: #e6e9f2;
+            --text-2: #94a3b8;
+            --soft: rgba(139, 92, 246, .18);
+            --soft-text: #c4b5fd;
+            --glass-nav: rgba(10, 15, 30, .72);
+            --shadow: 0 12px 30px rgba(0, 0, 0, .35);
+            --bs-body-bg: var(--bg);
+            --bs-body-color: var(--text);
+            --bs-border-color: var(--border);
+            --bs-secondary-color: var(--text-2);
+            --bs-secondary-bg: var(--surface-2);
+            --bs-tertiary-bg: var(--surface-2);
+            --bs-body-color-rgb: 230, 233, 242;
+            --bs-body-bg-rgb: 10, 15, 30;
+            --bs-secondary-color-rgb: 148, 163, 184;
+            --bs-secondary-bg-rgb: 26, 36, 61;
         }
         * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
         body {
-            background: #f3f4f8;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            transition: background .3s ease, color .3s ease;
         }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #c6cbd8; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #aab0c0; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2c3a5a; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #3a4a73; }
+
+        /* ---------- Navbar ---------- */
+        .navbar-glass {
+            position: sticky; top: 0; z-index: 1030;
+            background: var(--glass-nav);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+        .brand-icon {
+            width: 36px; height: 36px; border-radius: .75rem;
+            background: var(--grad); color: #fff;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; box-shadow: 0 4px 12px rgba(139, 92, 246, .35);
+        }
+        .text-gradient {
+            background: var(--grad);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-icon {
+            width: 38px; height: 38px; border-radius: .75rem;
+            border: 1px solid var(--border); background: var(--surface);
+            color: var(--text); display: inline-flex; align-items: center; justify-content: center;
+            transition: all .2s ease; font-size: 1rem;
+        }
+        .btn-icon:hover { background: var(--surface-2); transform: translateY(-1px); }
+        .pill-soft {
+            background: var(--soft); color: var(--soft-text);
+            font-weight: 600; border-radius: 2rem;
+        }
+
+        /* ---------- Hero ---------- */
         .hero {
             background: var(--grad);
             color: #fff;
-            border-radius: 0 0 2.5rem 2.5rem;
-            padding: 2.5rem 0 5rem;
+            border-radius: 0 0 3rem 3rem;
+            padding: 2.25rem 0 3.25rem;
             position: relative;
             overflow: hidden;
         }
         .hero::before, .hero::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
+            content: ''; position: absolute; border-radius: 50%;
+            background: rgba(255, 255, 255, .08);
         }
-        .hero::before { width: 320px; height: 320px; top: -120px; right: -80px; }
-        .hero::after { width: 200px; height: 200px; bottom: -90px; left: 8%; }
+        .hero::before { width: 340px; height: 340px; top: -140px; right: -70px; }
+        .hero::after { width: 220px; height: 220px; bottom: -110px; left: 6%; }
+        .hero .badge-soft { background: rgba(255,255,255,.2); color: #fff; }
+        .hero-date { font-size: .95rem; opacity: .9; }
+        .hero-panel {
+            background: rgba(255, 255, 255, .13);
+            border: 1px solid rgba(255, 255, 255, .28);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: relative; z-index: 1;
+        }
+        .letter-spacing { letter-spacing: .08em; }
+        .hero .form-control {
+            background: rgba(255, 255, 255, .16);
+            border: 1px solid rgba(255, 255, 255, .35); color: #fff;
+        }
+        .hero .form-control:focus {
+            background: rgba(255, 255, 255, .22); color: #fff;
+            box-shadow: 0 0 0 .25rem rgba(255, 255, 255, .15);
+        }
+        .hero input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .hero input[type="date"] { color-scheme: dark; }
 
-        .hero h1 { font-weight: 800; }
-        .hero .badge-soft { background: rgba(255,255,255,.2); color:#fff; }
-        .hero .btn-light { font-weight: 600; }
+        .btn-grad { background: var(--grad); color: #fff; font-weight: 600; transition: all .2s ease; }
+        .btn-grad:hover { color: #fff; filter: brightness(1.08); transform: translateY(-1px); }
+        .btn-glass {
+            background: rgba(255,255,255,.18); color: #fff;
+            border: 1px solid rgba(255,255,255,.4); font-weight: 600; transition: all .2s ease;
+        }
+        .btn-glass:hover { background: rgba(255,255,255,.3); color: #fff; transform: translateY(-1px); }
 
-        .main-wrap { margin-top: -3rem; }
+        .ring-wrap { position: relative; display: inline-block; }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,.22); stroke-width: 9; }
+        .ring-fg {
+            fill: none; stroke: #fff; stroke-width: 9; stroke-linecap: round;
+            stroke-dasharray: 282.74; stroke-dashoffset: 282.74;
+            transform: rotate(-90deg); transform-origin: center;
+            transition: stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
+        }
+        .ring-pct {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.35rem;
+        }
 
+        /* ---------- Layout & Cards ---------- */
+        .main-wrap { margin-top: -2.5rem; }
         .card {
-            border: none;
+            border: 1px solid var(--border);
+            background: var(--surface);
             border-radius: 1.25rem;
-            box-shadow: 0 10px 30px rgba(31, 35, 65, .08);
+            box-shadow: var(--shadow);
+            transition: background .3s ease, border-color .3s ease;
         }
         .card-header {
             background: transparent;
-            border-bottom: 1px solid #eef0f6;
+            border-bottom: 1px solid var(--border);
             font-weight: 700;
             border-radius: 1.25rem 1.25rem 0 0 !important;
+            padding-top: 1.1rem;
         }
+        .card-header i { color: var(--accent); }
 
         .stat-card {
             border-radius: 1rem;
-            transition: transform .15s ease, box-shadow .15s ease;
-            background: #fff;
-            border: 1px solid #eef0f6;
+            transition: transform .18s ease, box-shadow .18s ease;
+            background: var(--surface);
+            border: 1px solid var(--border);
         }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(31,35,65,.10); }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(31,35,65,.12); }
         .stat-icon {
             width: 44px; height: 44px;
             display: inline-flex; align-items: center; justify-content: center;
-            border-radius: .75rem; font-size: 1.25rem;
+            border-radius: .8rem; font-size: 1.25rem; flex-shrink: 0;
         }
         .ic-hadir { background:#d1fae5; color:#059669; }
         .ic-sakit { background:#fef3c7; color:#d97706; }
@@ -71,49 +184,53 @@
         .ic-belum { background:#e5e7eb; color:#6b7280; }
 
         .avatar {
-            width: 38px; height: 38px;
-            border-radius: 50%;
+            width: 38px; height: 38px; border-radius: 50%;
             display: inline-flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: .85rem; color: #fff;
-            background: var(--grad);
+            background: var(--grad); flex-shrink: 0;
         }
+
+        .table-head th {
+            background: var(--surface-2);
+            color: var(--text-2);
+            text-transform: uppercase;
+            font-size: .72rem;
+            letter-spacing: .05em;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+        }
+        .table > :not(caption) > * > * { border-bottom-color: var(--border); background-color: transparent; }
+        .table-hover > tbody > tr:hover > * { background-color: var(--surface-2); }
+        tbody tr { animation: rowIn .3s ease both; }
+        @keyframes rowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
         .status-btn {
             border-radius: 2rem;
-            border: 1.5px solid #e2e5ee;
-            background: #fff;
-            color: #64748b;
-            font-weight: 600;
-            font-size: .8rem;
-            padding: .32rem .8rem;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-2);
+            font-weight: 600; font-size: .78rem;
+            padding: .3rem .75rem;
             transition: all .15s ease;
         }
-        .status-btn:hover { border-color: #6366f1; color: #6366f1; transform: translateY(-1px); }
+        .status-btn:hover { border-color: var(--accent); color: var(--soft-text); transform: translateY(-1px); }
         .status-btn.active-hadir { background:#059669; border-color:#059669; color:#fff; }
         .status-btn.active-sakit { background:#d97706; border-color:#d97706; color:#fff; }
         .status-btn.active-izin  { background:#2563eb; border-color:#2563eb; color:#fff; }
         .status-btn.active-alpa  { background:#dc2626; border-color:#dc2626; color:#fff; }
 
         .btn-hapus {
-            border: none; background: transparent; color:#9aa1b5;
-            transition: all .15s ease;
+            border: none; background: transparent; color: var(--text-2);
+            transition: all .15s ease; border-radius: .5rem;
         }
         .btn-hapus:hover { color:#dc2626; background:#fee2e2; }
 
-        .progress {
-            height: 8px;
-            border-radius: 1rem;
-            background: rgba(255,255,255,.25);
-        }
-        .progress-bar { background:#fff; border-radius:1rem; }
-
+        /* ---------- Preview ---------- */
         .preview-render {
-            background: #fff;
-            border: 1px solid #eef0f6;
-            border-radius: .75rem;
-            padding: 1rem;
-            max-height: 300px; overflow: auto;
-            font-size: .9rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: .75rem; padding: 1rem;
+            max-height: 300px; overflow: auto; font-size: .9rem;
         }
         .preview-render h1 { font-size: 1.15rem; font-weight: 800; }
         .preview-render h2 {
@@ -124,24 +241,15 @@
             content: ''; width: 4px; height: 16px; border-radius: 2px;
             background: var(--grad); display: inline-block;
         }
-        .preview-render table {
-            width: 100%;
-            font-size: .82rem;
-            border-collapse: collapse;
-            margin: .5rem 0;
-        }
+        .preview-render table { width: 100%; font-size: .82rem; border-collapse: collapse; margin: .5rem 0; }
         .preview-render th {
-            background: #f3f4f8;
-            text-transform: uppercase;
-            font-size: .7rem;
-            letter-spacing: .03em;
-            color: #6b7280;
+            background: var(--surface); text-transform: uppercase;
+            font-size: .7rem; letter-spacing: .03em; color: var(--text-2);
         }
         .preview-render th, .preview-render td {
-            padding: .45rem .6rem;
-            border-bottom: 1px solid #eef0f6;
+            padding: .45rem .6rem; border-bottom: 1px solid var(--border);
         }
-        .preview-render tr:hover td { background: #fafafd; }
+        .preview-render tr:hover td { background: var(--surface); }
         .preview-render ul { padding-left: 1.2rem; margin: .4rem 0; }
         .preview-render li { margin: .15rem 0; }
         .st-badge {
@@ -152,77 +260,120 @@
         .st-sakit { background:#fef3c7; color:#d97706; }
         .st-izin  { background:#dbeafe; color:#2563eb; }
         .st-alpa  { background:#fee2e2; color:#dc2626; }
-        .st-b      { background:#e5e7eb; color:#6b7280; }
+        .st-b     { background:#e5e7eb; color:#6b7280; }
 
         .empty-state { padding: 3rem 1rem; }
-        .empty-state i { font-size: 3rem; color:#c9cfe0; }
+        .empty-state i { font-size: 3rem; color: var(--text-2); opacity: .4; }
+
+        /* ---------- Modal / Toast ---------- */
+        .modal-content {
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .modal-footer { background: var(--surface-2); border-top: 1px solid var(--border); }
+        .chip {
+            background: var(--soft); color: var(--soft-text);
+            border-radius: 2rem; padding: .4rem .85rem;
+            font-size: .8rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: .35rem;
+        }
+        .chip i { color: var(--accent); }
+        .toast { background: var(--grad); color: #fff; border: none; }
+        .toast .btn-close { filter: invert(1); }
     </style>
 </head>
 <body>
 
+<!-- Navbar -->
+<nav class="navbar navbar-expand navbar-glass py-2">
+    <div class="container">
+        <span class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0">
+            <span class="brand-icon"><i class="bi bi-clipboard2-check"></i></span>
+            Absen<span class="text-gradient">Ku</span>
+        </span>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            <span class="pill-soft badge d-none d-sm-inline-flex align-items-center px-3 py-2">
+                <i class="bi bi-people me-1"></i><span id="navJumlah">0</span> peserta
+            </span>
+            <button class="btn-icon" id="btnTema" onclick="toggleTema()" title="Ganti tema gelap/terang">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
 <!-- Hero -->
-<div class="hero">
+<section class="hero">
     <div class="container position-relative">
-        <div class="row align-items-center gy-3">
-            <div class="col-md-8">
+        <div class="row align-items-center gy-4">
+            <div class="col-md-7">
                 <span class="badge badge-soft mb-2"><i class="bi bi-calendar-check me-1"></i>Presensi Digital</span>
-                <h1 class="h2 mb-1">Absen Kehadiran</h1>
-                <p class="mb-0 opacity-75"><i class="bi bi-shield-check me-1"></i>Data tersimpan otomatis di browser (localStorage) & bisa diexport ke Markdown.</p>
+                <h1 class="display-6 fw-bold mb-2">Rekap Kehadiran</h1>
+                <p class="hero-date mb-3" id="heroTanggal"></p>
+                <p class="opacity-75 mb-0"><i class="bi bi-shield-check me-1"></i>Tersimpan otomatis di browser — export ke Markdown kapan saja.</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <div class="d-inline-block text-start me-3">
-                    <div class="fs-2 fw-bold" id="heroPersen">0%</div>
-                    <div class="opacity-75 small">sudah absen</div>
-                </div>
-                <div class="progress mt-2" style="width:160px;display:inline-block;">
-                    <div class="progress-bar" id="heroBar" style="width:0%"></div>
+            <div class="col-md-5">
+                <div class="hero-panel p-3 p-sm-4 rounded-4">
+                    <div class="d-flex align-items-center gap-4 flex-wrap">
+                        <div class="ring-wrap text-center">
+                            <svg width="110" height="110" viewBox="0 0 110 110">
+                                <circle class="ring-bg" cx="55" cy="55" r="45"></circle>
+                                <circle class="ring-fg" id="ringFg" cx="55" cy="55" r="45"></circle>
+                            </svg>
+                            <span class="ring-pct" id="heroPersen">0%</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="small text-uppercase letter-spacing opacity-75 mb-2">Kehadiran</div>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="bi bi-calendar3 fs-5"></i>
+                                <input type="date" id="inputTanggal" class="form-control form-control-sm" onchange="render()">
+                            </div>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-grad btn-sm" onclick="openExport(false)"><i class="bi bi-calendar-day me-1"></i>Rekap Hari Ini</button>
+                                <button class="btn btn-glass btn-sm" onclick="openExport(true)"><i class="bi bi-calendar-week me-1"></i>Semua</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <div class="container main-wrap pb-5">
-    <!-- Toolbar -->
-    <div class="card p-3 mb-4 d-flex flex-wrap align-items-center gap-2">
-        <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap">
-            <div class="form-floating" style="min-width:200px">
-                <input type="date" id="inputTanggal" class="form-control" onchange="render()">
-                <label for="inputTanggal"><i class="bi bi-calendar3 me-1"></i>Tanggal</label>
-            </div>
-            <span class="text-muted small" id="labelTanggal"></span>
-        </div>
-        <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-primary" onclick="openExport(false)"><i class="bi bi-calendar-day me-1"></i>Rekap Hari Ini</button>
-            <button class="btn btn-primary" onclick="openExport(true)"><i class="bi bi-calendar-week me-1"></i>Semua Data</button>
-        </div>
-    </div>
-
     <div class="row g-4">
         <!-- Kiri -->
         <div class="col-lg-7">
             <div class="card mb-4">
-                <div class="card-header bg-white">
-                    <i class="bi bi-person-plus-fill text-primary me-2"></i>Tambah Peserta
+                <div class="card-header">
+                    <i class="bi bi-person-plus-fill me-2"></i>Tambah Peserta
                 </div>
                 <div class="card-body">
                     <div class="input-group">
-                        <input type="text" id="inputNama" class="form-control" placeholder="Masukkan nama peserta..." onkeydown="if(event.key==='Enter')addPeserta()">
-                        <button class="btn btn-primary" onclick="addPeserta()"><i class="bi bi-plus-lg me-1"></i>Tambah</button>
+                        <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-person"></i></span>
+                        <input type="text" id="inputNama" class="form-control border-start-0" placeholder="Masukkan nama peserta..." onkeydown="if(event.key==='Enter')addPeserta()">
+                        <button class="btn btn-grad" onclick="addPeserta()"><i class="bi bi-plus-lg me-1"></i>Tambah</button>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-people-fill text-secondary me-2"></i>Daftar Peserta</span>
-                    <span id="jumlahPeserta" class="badge text-bg-secondary rounded-pill"></span>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-people-fill me-2"></i>Daftar Peserta</span>
+                    <span id="jumlahPeserta" class="pill-soft badge px-3 py-2"></span>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3">
+                        <div class="input-group input-group-sm flex-grow-1">
+                            <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="inputCari" class="form-control border-start-0" placeholder="Cari peserta..." oninput="render()">
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm flex-shrink-0" onclick="resetData()" title="Hapus semua data"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr class="small text-uppercase text-muted">
+                            <thead class="table-head">
+                                <tr>
                                     <th style="width:50px">No</th>
                                     <th>Nama</th>
                                     <th class="text-center">Status</th>
@@ -232,7 +383,7 @@
                             <tbody id="tbodyPeserta"></tbody>
                         </table>
                     </div>
-                    <div id="emptyPeserta" class="empty-state text-center text-muted d-none">
+                    <div id="emptyPeserta" class="empty-state text-center text-secondary d-none">
                         <i class="bi bi-inbox d-block mb-2"></i>
                         Belum ada peserta.<br>Tambahkan peserta terlebih dahulu di atas.
                     </div>
@@ -243,21 +394,17 @@
         <!-- Kanan -->
         <div class="col-lg-5">
             <div class="card mb-4">
-                <div class="card-header bg-white">
-                    <i class="bi bi-bar-chart-fill text-success me-2"></i>Ringkasan
-                </div>
+                <div class="card-header"><i class="bi bi-bar-chart-fill me-2"></i>Ringkasan</div>
                 <div class="card-body">
                     <div class="row g-2" id="statCards"></div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header bg-white">
-                    <span><i class="bi bi-eye-fill text-info me-2"></i>Pratinjau Export .md</span>
-                </div>
+                <div class="card-header"><i class="bi bi-eye-fill me-2"></i>Pratinjau Export .md</div>
                 <div class="card-body">
                     <div id="previewRender" class="preview-render mb-3"></div>
-                    <button class="btn btn-success w-100" onclick="openExport(false)"><i class="bi bi-file-earmark-arrow-down me-1"></i>Export Rekap Hari Ini</button>
+                    <button class="btn btn-grad w-100" onclick="openExport(false)"><i class="bi bi-file-earmark-arrow-down me-1"></i>Export Rekap Hari Ini</button>
                 </div>
             </div>
         </div>
@@ -287,30 +434,32 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="namaFile" class="form-label small fw-semibold text-muted mb-1"><i class="bi bi-file-earmark-text me-1"></i>Nama file</label>
+                    <label for="namaFile" class="form-label small fw-semibold text-secondary mb-1"><i class="bi bi-file-earmark-text me-1"></i>Nama file</label>
                     <div class="input-group">
                         <input type="text" id="namaFile" class="form-control">
-                        <span class="input-group-text bg-light text-muted">.md</span>
+                        <span class="input-group-text bg-transparent text-secondary">.md</span>
                     </div>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 mb-3" id="chipsExport"></div>
 
-                <label class="form-label small fw-semibold text-muted mb-1"><i class="bi bi-eye me-1"></i>Pratinjau isi file</label>
+                <label class="form-label small fw-semibold text-secondary mb-1"><i class="bi bi-eye me-1"></i>Pratinjau isi file</label>
                 <div id="previewExportRender" class="preview-render" style="max-height:220px"></div>
             </div>
-            <div class="modal-footer bg-light">
-                <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                <button class="btn btn-success px-4" onclick="saveExport()"><i class="bi bi-save me-1"></i>Simpan File .md</button>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-grad px-4" onclick="saveExport()"><i class="bi bi-save me-1"></i>Simpan File .md</button>
             </div>
         </div>
     </div>
 </div>
 
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="toast" class="toast align-items-center text-bg-success border-0" role="alert">
+    <div id="toast" class="toast align-items-center border-0" role="alert">
         <div class="d-flex">
-            <div class="toast-body" id="toastBody"></div>
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill"></i><span id="toastBody"></span>
+            </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
@@ -319,12 +468,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script>
     const STORAGE_KEY = 'absen_data';
+    const TEMA_KEY = 'absen_tema';
     const STATUS = {
         hadir: { label: 'Hadir', icon: 'bi-check2-circle', cls: 'active-hadir', ic: 'ic-hadir' },
         sakit: { label: 'Sakit', icon: 'bi-heart-pulse',    cls: 'active-sakit', ic: 'ic-sakit' },
         izin:  { label: 'Izin',  icon: 'bi-calendar2-x',    cls: 'active-izin',  ic: 'ic-izin' },
         alpa:  { label: 'Alpa',  icon: 'bi-x-circle',       cls: 'active-alpa',  ic: 'ic-alpa' }
     };
+    const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     let toastEl, toast;
 
     let data = loadData();
@@ -354,6 +506,12 @@
         return el.value;
     }
 
+    function formatTanggal(iso) {
+        const [y, m, d] = iso.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        return `${HARI[dt.getDay()]}, ${d} ${BULAN[m - 1]} ${y}`;
+    }
+
     function showToast(msg) {
         if (!toastEl) {
             toastEl = document.getElementById('toast');
@@ -368,6 +526,26 @@
         return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
     }
 
+    /* ---------- Tema ---------- */
+    function initTema() {
+        const saved = localStorage.getItem(TEMA_KEY);
+        const gelap = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', gelap ? 'dark' : 'light');
+        updateTemaIcon();
+    }
+    function toggleTema() {
+        const gelap = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', gelap ? 'light' : 'dark');
+        localStorage.setItem(TEMA_KEY, gelap ? 'light' : 'dark');
+        updateTemaIcon();
+    }
+    function updateTemaIcon() {
+        const gelap = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.getElementById('btnTema').innerHTML =
+            `<i class="bi ${gelap ? 'bi-sun' : 'bi-moon-stars'}"></i>`;
+    }
+
+    /* ---------- CRUD ---------- */
     function addPeserta() {
         const input = document.getElementById('inputNama');
         const nama = input.value.trim();
@@ -395,6 +573,14 @@
         showToast(`"${nama}" dihapus.`);
     }
 
+    function resetData() {
+        if (!confirm('Hapus semua peserta & data absen? Tindakan ini tidak bisa dibatalkan.')) return;
+        data = { peserta: [], records: {} };
+        saveData();
+        render();
+        showToast('Semua data dihapus.');
+    }
+
     function setStatus(nama, status) {
         const tgl = getTanggal();
         if (!data.records[tgl]) data.records[tgl] = {};
@@ -407,21 +593,26 @@
         render();
     }
 
+    /* ---------- Render ---------- */
     function render() {
         const tgl = getTanggal();
         const rec = data.records[tgl] || {};
+        const q = document.getElementById('inputCari').value.trim().toLowerCase();
         const tbody = document.getElementById('tbodyPeserta');
         const empty = document.getElementById('emptyPeserta');
         const jumlah = document.getElementById('jumlahPeserta');
-        const labelTanggal = document.getElementById('labelTanggal');
+        const navJumlah = document.getElementById('navJumlah');
 
         jumlah.textContent = data.peserta.length + ' orang';
-        labelTanggal.textContent = 'Absensi tanggal ' + tgl;
+        navJumlah.textContent = data.peserta.length;
+        document.getElementById('heroTanggal').textContent = formatTanggal(tgl);
+
+        const daftar = data.peserta.filter(n => !q || n.toLowerCase().includes(q));
 
         tbody.innerHTML = '';
-        data.peserta.forEach((nama, i) => {
+        daftar.forEach((nama, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="text-muted">${i + 1}</td>`;
+            tr.innerHTML = `<td class="text-secondary">${i + 1}</td>`;
 
             const tdNama = document.createElement('td');
             tdNama.innerHTML = `<div class="d-flex align-items-center gap-2">
@@ -447,19 +638,19 @@
 
             const tdHapus = document.createElement('td');
             tdHapus.className = 'text-center';
-            tdHapus.innerHTML = `<button class="btn-hapus" title="Hapus"><i class="bi bi-trash3"></i></button>`;
+            tdHapus.innerHTML = `<button class="btn-hapus px-2 py-1" title="Hapus"><i class="bi bi-trash3"></i></button>`;
             tdHapus.firstChild.onclick = () => hapusPeserta(nama);
             tr.appendChild(tdHapus);
 
             tbody.appendChild(tr);
         });
 
-        empty.classList.toggle('d-none', data.peserta.length > 0);
-        renderStat(rec, tgl);
+        empty.classList.toggle('d-none', daftar.length > 0);
+        renderStat(rec);
         document.getElementById('previewRender').innerHTML = mdToHtml(buildMd());
     }
 
-    function renderStat(rec, tgl) {
+    function renderStat(rec) {
         const container = document.getElementById('statCards');
         const counts = { hadir: 0, sakit: 0, izin: 0, alpa: 0, belum: 0 };
         data.peserta.forEach(nama => {
@@ -469,11 +660,11 @@
         });
 
         const cards = [
-            { key: 'hadir', label: 'Hadir',    count: counts.hadir, ic: 'ic-hadir', icon: 'bi-check2-circle' },
-            { key: 'sakit', label: 'Sakit',    count: counts.sakit, ic: 'ic-sakit', icon: 'bi-heart-pulse' },
-            { key: 'izin',  label: 'Izin',     count: counts.izin,  ic: 'ic-izin',  icon: 'bi-calendar2-x' },
-            { key: 'alpa',  label: 'Alpa',     count: counts.alpa,  ic: 'ic-alpa',  icon: 'bi-x-circle' },
-            { key: 'belum', label: 'Belum',    count: counts.belum, ic: 'ic-belum', icon: 'bi-question-circle' }
+            { label: 'Hadir', count: counts.hadir, ic: 'ic-hadir', icon: 'bi-check2-circle' },
+            { label: 'Sakit', count: counts.sakit, ic: 'ic-sakit', icon: 'bi-heart-pulse' },
+            { label: 'Izin',  count: counts.izin,  ic: 'ic-izin',  icon: 'bi-calendar2-x' },
+            { label: 'Alpa',  count: counts.alpa,  ic: 'ic-alpa',  icon: 'bi-x-circle' },
+            { label: 'Belum', count: counts.belum, ic: 'ic-belum', icon: 'bi-question-circle' }
         ];
 
         container.innerHTML = '';
@@ -484,7 +675,7 @@
                 <div class="stat-icon ${c.ic}"><i class="bi ${c.icon}"></i></div>
                 <div>
                     <div class="fs-4 fw-bold">${c.count}</div>
-                    <div class="small text-muted">${c.label}</div>
+                    <div class="small text-secondary">${c.label}</div>
                 </div>
             </div>`;
             container.appendChild(col);
@@ -494,14 +685,15 @@
         const selesai = total - counts.belum;
         const pct = Math.round((selesai / total) * 100);
         document.getElementById('heroPersen').textContent = pct + '%';
-        document.getElementById('heroBar').style.width = pct + '%';
+        const C = 2 * Math.PI * 45;
+        document.getElementById('ringFg').style.strokeDashoffset = C - (pct / 100) * C;
     }
 
+    /* ---------- Markdown ---------- */
     function mdToHtml(md) {
         const stCls = { 'Hadir': 'st-hadir', 'Sakit': 'st-sakit', 'Izin': 'st-izin', 'Alpa': 'st-alpa', '-': 'st-b' };
         const escHtml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const inline = s =>
-            s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        const inline = s => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
         const rows = md.split('\n');
         const out = [];
@@ -510,29 +702,20 @@
         while (i < rows.length) {
             const line = rows[i];
 
-            if (line.startsWith('# ')) {
-                out.push(`<h1>${inline(escHtml(line.slice(2)))}</h1>`);
-                i++; continue;
-            }
-            if (line.startsWith('## ')) {
-                out.push(`<h2>${inline(escHtml(line.slice(3)))}</h2>`);
-                i++; continue;
-            }
+            if (line.startsWith('# ')) { out.push(`<h1>${inline(escHtml(line.slice(2)))}</h1>`); i++; continue; }
+            if (line.startsWith('## ')) { out.push(`<h2>${inline(escHtml(line.slice(3)))}</h2>`); i++; continue; }
             if (line.startsWith('|') && i + 1 < rows.length && /^\|[\s:-|]+\|?$/.test(rows[i + 1])) {
-                const header = line.split('|').map(c => c.trim()).filter((c, idx, arr) => !(idx === 0 || idx === arr.length - 1) || c);
-                const headCells = header;
+                const headCells = line.split('|').map(c => c.trim()).filter((c, idx, arr) => !(idx === 0 || idx === arr.length - 1) || c);
                 const dataCells = [];
                 i += 2;
                 while (i < rows.length && rows[i].startsWith('|')) {
-                    const parts = rows[i].split('|').map(c => c.trim());
-                    dataCells.push(parts.slice(1, -1));
+                    dataCells.push(rows[i].split('|').map(c => c.trim()).slice(1, -1));
                     i++;
                 }
                 const ths = headCells.map(c => `<th>${inline(escHtml(c))}</th>`).join('');
                 const trs = dataCells.map(cells => {
                     const tds = cells.map(c => {
-                        const clean = c.replace(/\*\*/g, '');
-                        const key = clean.trim();
+                        const key = c.replace(/\*\*/g, '').trim();
                         const badge = stCls[key];
                         if (badge) return `<td class="text-center"><span class="st-badge ${badge}">${escHtml(key)}</span></td>`;
                         return `<td>${inline(escHtml(c))}</td>`;
@@ -562,7 +745,7 @@
         const lines = [];
         lines.push('# Rekap Absen Kehadiran');
         lines.push('');
-        lines.push('**Tanggal:** ' + getTanggal());
+        lines.push('**Tanggal:** ' + formatTanggal(getTanggal()));
         lines.push('');
         lines.push('| No | Nama | Status |');
         lines.push('|----|------|--------|');
@@ -607,7 +790,7 @@
         }
 
         tanggals.forEach(tgl => {
-            lines.push(`## ${tgl}`);
+            lines.push(`## ${formatTanggal(tgl)}`);
             lines.push('');
             lines.push('| No | Nama | Status |');
             lines.push('|----|------|--------|');
@@ -634,6 +817,7 @@
         URL.revokeObjectURL(url);
     }
 
+    /* ---------- Export ---------- */
     let jenisExport = false;
     let exportModal;
 
@@ -666,9 +850,7 @@
             { icon: 'bi-check2-square', label: 'Status terisi', val: jumlahStatus }
         ];
         document.getElementById('chipsExport').innerHTML = items.map(c => `
-            <span class="badge text-bg-light border px-3 py-2">
-                <i class="bi ${c.icon} text-primary me-1"></i>${c.label}: <strong>${c.val}</strong>
-            </span>`).join('');
+            <span class="chip"><i class="bi ${c.icon}"></i>${c.label}: <strong>${c.val}</strong></span>`).join('');
     }
 
     async function saveExport() {
@@ -695,6 +877,7 @@
         }
     }
 
+    initTema();
     render();
 </script>
 
