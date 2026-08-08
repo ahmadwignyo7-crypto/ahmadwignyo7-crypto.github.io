@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absen Kehadiran</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        }
+        * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        body {
+            background: #f3f4f8;
+            min-height: 100vh;
+        }
+        .hero {
+            background: var(--grad);
+            color: #fff;
+            border-radius: 0 0 2.5rem 2.5rem;
+            padding: 2.5rem 0 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before, .hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .hero::before { width: 320px; height: 320px; top: -120px; right: -80px; }
+        .hero::after { width: 200px; height: 200px; bottom: -90px; left: 8%; }
+
+        .hero h1 { font-weight: 800; }
+        .hero .badge-soft { background: rgba(255,255,255,.2); color:#fff; }
+        .hero .btn-light { font-weight: 600; }
+
+        .main-wrap { margin-top: -3rem; }
+
+        .card {
+            border: none;
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 30px rgba(31, 35, 65, .08);
+        }
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid #eef0f6;
+            font-weight: 700;
+            border-radius: 1.25rem 1.25rem 0 0 !important;
+        }
+
+        .stat-card {
+            border-radius: 1rem;
+            transition: transform .15s ease, box-shadow .15s ease;
+            background: #fff;
+            border: 1px solid #eef0f6;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(31,35,65,.10); }
+        .stat-icon {
+            width: 44px; height: 44px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: .75rem; font-size: 1.25rem;
+        }
+        .ic-hadir { background:#d1fae5; color:#059669; }
+        .ic-sakit { background:#fef3c7; color:#d97706; }
+        .ic-izin  { background:#dbeafe; color:#2563eb; }
+        .ic-alpa  { background:#fee2e2; color:#dc2626; }
+        .ic-belum { background:#e5e7eb; color:#6b7280; }
+
+        .avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem; color: #fff;
+            background: var(--grad);
+        }
+
+        .status-btn {
+            border-radius: 2rem;
+            border: 1.5px solid #e2e5ee;
+            background: #fff;
+            color: #64748b;
+            font-weight: 600;
+            font-size: .8rem;
+            padding: .32rem .8rem;
+            transition: all .15s ease;
+        }
+        .status-btn:hover { border-color: #6366f1; color: #6366f1; transform: translateY(-1px); }
+        .status-btn.active-hadir { background:#059669; border-color:#059669; color:#fff; }
+        .status-btn.active-sakit { background:#d97706; border-color:#d97706; color:#fff; }
+        .status-btn.active-izin  { background:#2563eb; border-color:#2563eb; color:#fff; }
+        .status-btn.active-alpa  { background:#dc2626; border-color:#dc2626; color:#fff; }
+
+        .btn-hapus {
+            border: none; background: transparent; color:#9aa1b5;
+            transition: all .15s ease;
+        }
+        .btn-hapus:hover { color:#dc2626; background:#fee2e2; }
+
+        .progress {
+            height: 8px;
+            border-radius: 1rem;
+            background: rgba(255,255,255,.25);
+        }
+        .progress-bar { background:#fff; border-radius:1rem; }
+
+        .preview-render {
+            background: #fff;
+            border: 1px solid #eef0f6;
+            border-radius: .75rem;
+            padding: 1rem;
+            max-height: 300px; overflow: auto;
+            font-size: .9rem;
+        }
+        .preview-render h1 { font-size: 1.15rem; font-weight: 800; }
+        .preview-render h2 {
+            font-size: .95rem; font-weight: 700; margin-top: 1rem;
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .preview-render h2::before {
+            content: ''; width: 4px; height: 16px; border-radius: 2px;
+            background: var(--grad); display: inline-block;
+        }
+        .preview-render table {
+            width: 100%;
+            font-size: .82rem;
+            border-collapse: collapse;
+            margin: .5rem 0;
+        }
+        .preview-render th {
+            background: #f3f4f8;
+            text-transform: uppercase;
+            font-size: .7rem;
+            letter-spacing: .03em;
+            color: #6b7280;
+        }
+        .preview-render th, .preview-render td {
+            padding: .45rem .6rem;
+            border-bottom: 1px solid #eef0f6;
+        }
+        .preview-render tr:hover td { background: #fafafd; }
+        .preview-render ul { padding-left: 1.2rem; margin: .4rem 0; }
+        .preview-render li { margin: .15rem 0; }
+        .st-badge {
+            display: inline-block; padding: .15rem .55rem;
+            border-radius: 2rem; font-weight: 600; font-size: .72rem;
+        }
+        .st-hadir { background:#d1fae5; color:#059669; }
+        .st-sakit { background:#fef3c7; color:#d97706; }
+        .st-izin  { background:#dbeafe; color:#2563eb; }
+        .st-alpa  { background:#fee2e2; color:#dc2626; }
+        .st-b      { background:#e5e7eb; color:#6b7280; }
+
+        .empty-state { padding: 3rem 1rem; }
+        .empty-state i { font-size: 3rem; color:#c9cfe0; }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="container position-relative">
+        <div class="row align-items-center gy-3">
+            <div class="col-md-8">
+                <span class="badge badge-soft mb-2"><i class="bi bi-calendar-check me-1"></i>Presensi Digital</span>
+                <h1 class="h2 mb-1">Absen Kehadiran</h1>
+                <p class="mb-0 opacity-75"><i class="bi bi-shield-check me-1"></i>Data tersimpan otomatis di browser (localStorage) & bisa diexport ke Markdown.</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-inline-block text-start me-3">
+                    <div class="fs-2 fw-bold" id="heroPersen">0%</div>
+                    <div class="opacity-75 small">sudah absen</div>
+                </div>
+                <div class="progress mt-2" style="width:160px;display:inline-block;">
+                    <div class="progress-bar" id="heroBar" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container main-wrap pb-5">
+    <!-- Toolbar -->
+    <div class="card p-3 mb-4 d-flex flex-wrap align-items-center gap-2">
+        <div class="flex-grow-1 d-flex align-items-center gap-2 flex-wrap">
+            <div class="form-floating" style="min-width:200px">
+                <input type="date" id="inputTanggal" class="form-control" onchange="render()">
+                <label for="inputTanggal"><i class="bi bi-calendar3 me-1"></i>Tanggal</label>
+            </div>
+            <span class="text-muted small" id="labelTanggal"></span>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-primary" onclick="openExport(false)"><i class="bi bi-calendar-day me-1"></i>Rekap Hari Ini</button>
+            <button class="btn btn-primary" onclick="openExport(true)"><i class="bi bi-calendar-week me-1"></i>Semua Data</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Kiri -->
+        <div class="col-lg-7">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <i class="bi bi-person-plus-fill text-primary me-2"></i>Tambah Peserta
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" id="inputNama" class="form-control" placeholder="Masukkan nama peserta..." onkeydown="if(event.key==='Enter')addPeserta()">
+                        <button class="btn btn-primary" onclick="addPeserta()"><i class="bi bi-plus-lg me-1"></i>Tambah</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-people-fill text-secondary me-2"></i>Daftar Peserta</span>
+                    <span id="jumlahPeserta" class="badge text-bg-secondary rounded-pill"></span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small text-uppercase text-muted">
+                                    <th style="width:50px">No</th>
+                                    <th>Nama</th>
+                                    <th class="text-center">Status</th>
+                                    <th style="width:50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyPeserta"></tbody>
+                        </table>
+                    </div>
+                    <div id="emptyPeserta" class="empty-state text-center text-muted d-none">
+                        <i class="bi bi-inbox d-block mb-2"></i>
+                        Belum ada peserta.<br>Tambahkan peserta terlebih dahulu di atas.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kanan -->
+        <div class="col-lg-5">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <i class="bi bi-bar-chart-fill text-success me-2"></i>Ringkasan
+                </div>
+                <div class="card-body">
+                    <div class="row g-2" id="statCards"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-white">
+                    <span><i class="bi bi-eye-fill text-info me-2"></i>Pratinjau Export .md</span>
+                </div>
+                <div class="card-body">
+                    <div id="previewRender" class="preview-render mb-3"></div>
+                    <button class="btn btn-success w-100" onclick="openExport(false)"><i class="bi bi-file-earmark-arrow-down me-1"></i>Export Rekap Hari Ini</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Export -->
+<div class="modal fade" id="modalExport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-4 overflow-hidden">
+            <div class="p-4 text-white" style="background:var(--grad)">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="fs-3"><i class="bi bi-file-earmark-arrow-down-fill"></i></span>
+                    <div>
+                        <h5 class="fw-bold mb-0">Export Rekap Absen</h5>
+                        <small class="opacity-75">Atur file lalu simpan ke perangkat Anda</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+            </div>
+            <div class="modal-body p-4">
+                <div class="btn-group w-100 mb-3" role="group" aria-label="Jenis export">
+                    <input type="radio" class="btn-check" name="jenisExport" id="jenisHariIni" onchange="ubahJenisExport(false)">
+                    <label class="btn btn-outline-primary" for="jenisHariIni"><i class="bi bi-calendar-day me-1"></i>Rekap Hari Ini</label>
+                    <input type="radio" class="btn-check" name="jenisExport" id="jenisSemua" onchange="ubahJenisExport(true)">
+                    <label class="btn btn-outline-primary" for="jenisSemua"><i class="bi bi-calendar-week me-1"></i>Semua Data</label>
+                </div>
+
+                <div class="mb-3">
+                    <label for="namaFile" class="form-label small fw-semibold text-muted mb-1"><i class="bi bi-file-earmark-text me-1"></i>Nama file</label>
+                    <div class="input-group">
+                        <input type="text" id="namaFile" class="form-control">
+                        <span class="input-group-text bg-light text-muted">.md</span>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mb-3" id="chipsExport"></div>
+
+                <label class="form-label small fw-semibold text-muted mb-1"><i class="bi bi-eye me-1"></i>Pratinjau isi file</label>
+                <div id="previewExportRender" class="preview-render" style="max-height:220px"></div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-success px-4" onclick="saveExport()"><i class="bi bi-save me-1"></i>Simpan File .md</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastBody"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>
+    const STORAGE_KEY = 'absen_data';
+    const STATUS = {
+        hadir: { label: 'Hadir', icon: 'bi-check2-circle', cls: 'active-hadir', ic: 'ic-hadir' },
+        sakit: { label: 'Sakit', icon: 'bi-heart-pulse',    cls: 'active-sakit', ic: 'ic-sakit' },
+        izin:  { label: 'Izin',  icon: 'bi-calendar2-x',    cls: 'active-izin',  ic: 'ic-izin' },
+        alpa:  { label: 'Alpa',  icon: 'bi-x-circle',       cls: 'active-alpa',  ic: 'ic-alpa' }
+    };
+    let toastEl, toast;
+
+    let data = loadData();
+
+    function loadData() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) return JSON.parse(raw);
+        } catch (e) {}
+        return { peserta: [], records: {} };
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function tanggalHariIni() {
+        const d = new Date();
+        const p = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    }
+
+    function getTanggal() {
+        const el = document.getElementById('inputTanggal');
+        if (el.value) return el.value;
+        el.value = tanggalHariIni();
+        return el.value;
+    }
+
+    function showToast(msg) {
+        if (!toastEl) {
+            toastEl = document.getElementById('toast');
+            toast = new bootstrap.Toast(toastEl, { delay: 1800 });
+        }
+        document.getElementById('toastBody').textContent = msg;
+        toast.show();
+    }
+
+    function inisial(nama) {
+        const parts = nama.trim().split(/\s+/);
+        return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+    }
+
+    function addPeserta() {
+        const input = document.getElementById('inputNama');
+        const nama = input.value.trim();
+        if (!nama) return;
+        if (data.peserta.includes(nama)) {
+            showToast('Nama sudah terdaftar!');
+            return;
+        }
+        data.peserta.push(nama);
+        saveData();
+        input.value = '';
+        render();
+        input.focus();
+        showToast(`"${nama}" berhasil ditambahkan.`);
+    }
+
+    function hapusPeserta(nama) {
+        if (!confirm(`Hapus peserta "${nama}"?`)) return;
+        data.peserta = data.peserta.filter(n => n !== nama);
+        Object.keys(data.records).forEach(tgl => {
+            if (data.records[tgl]) delete data.records[tgl][nama];
+        });
+        saveData();
+        render();
+        showToast(`"${nama}" dihapus.`);
+    }
+
+    function setStatus(nama, status) {
+        const tgl = getTanggal();
+        if (!data.records[tgl]) data.records[tgl] = {};
+        if (data.records[tgl][nama] === status) {
+            delete data.records[tgl][nama];
+        } else {
+            data.records[tgl][nama] = status;
+        }
+        saveData();
+        render();
+    }
+
+    function render() {
+        const tgl = getTanggal();
+        const rec = data.records[tgl] || {};
+        const tbody = document.getElementById('tbodyPeserta');
+        const empty = document.getElementById('emptyPeserta');
+        const jumlah = document.getElementById('jumlahPeserta');
+        const labelTanggal = document.getElementById('labelTanggal');
+
+        jumlah.textContent = data.peserta.length + ' orang';
+        labelTanggal.textContent = 'Absensi tanggal ' + tgl;
+
+        tbody.innerHTML = '';
+        data.peserta.forEach((nama, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="text-muted">${i + 1}</td>`;
+
+            const tdNama = document.createElement('td');
+            tdNama.innerHTML = `<div class="d-flex align-items-center gap-2">
+                <span class="avatar">${inisial(nama)}</span>
+                <span class="fw-semibold">${nama.replace(/</g, '&lt;')}</span>
+            </div>`;
+            tr.appendChild(tdNama);
+
+            const tdStatus = document.createElement('td');
+            tdStatus.className = 'text-center';
+            const st = rec[nama];
+            Object.keys(STATUS).forEach(key => {
+                const s = STATUS[key];
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'status-btn me-1 mb-1';
+                btn.innerHTML = `<i class="bi ${s.icon} me-1"></i>${s.label}`;
+                if (st === key) btn.classList.add(s.cls);
+                btn.onclick = () => setStatus(nama, key);
+                tdStatus.appendChild(btn);
+            });
+            tr.appendChild(tdStatus);
+
+            const tdHapus = document.createElement('td');
+            tdHapus.className = 'text-center';
+            tdHapus.innerHTML = `<button class="btn-hapus" title="Hapus"><i class="bi bi-trash3"></i></button>`;
+            tdHapus.firstChild.onclick = () => hapusPeserta(nama);
+            tr.appendChild(tdHapus);
+
+            tbody.appendChild(tr);
+        });
+
+        empty.classList.toggle('d-none', data.peserta.length > 0);
+        renderStat(rec, tgl);
+        document.getElementById('previewRender').innerHTML = mdToHtml(buildMd());
+    }
+
+    function renderStat(rec, tgl) {
+        const container = document.getElementById('statCards');
+        const counts = { hadir: 0, sakit: 0, izin: 0, alpa: 0, belum: 0 };
+        data.peserta.forEach(nama => {
+            const s = rec[nama];
+            if (s) counts[s]++;
+            else counts.belum++;
+        });
+
+        const cards = [
+            { key: 'hadir', label: 'Hadir',    count: counts.hadir, ic: 'ic-hadir', icon: 'bi-check2-circle' },
+            { key: 'sakit', label: 'Sakit',    count: counts.sakit, ic: 'ic-sakit', icon: 'bi-heart-pulse' },
+            { key: 'izin',  label: 'Izin',     count: counts.izin,  ic: 'ic-izin',  icon: 'bi-calendar2-x' },
+            { key: 'alpa',  label: 'Alpa',     count: counts.alpa,  ic: 'ic-alpa',  icon: 'bi-x-circle' },
+            { key: 'belum', label: 'Belum',    count: counts.belum, ic: 'ic-belum', icon: 'bi-question-circle' }
+        ];
+
+        container.innerHTML = '';
+        cards.forEach(c => {
+            const col = document.createElement('div');
+            col.className = 'col-6';
+            col.innerHTML = `<div class="stat-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-icon ${c.ic}"><i class="bi ${c.icon}"></i></div>
+                <div>
+                    <div class="fs-4 fw-bold">${c.count}</div>
+                    <div class="small text-muted">${c.label}</div>
+                </div>
+            </div>`;
+            container.appendChild(col);
+        });
+
+        const total = data.peserta.length || 1;
+        const selesai = total - counts.belum;
+        const pct = Math.round((selesai / total) * 100);
+        document.getElementById('heroPersen').textContent = pct + '%';
+        document.getElementById('heroBar').style.width = pct + '%';
+    }
+
+    function mdToHtml(md) {
+        const stCls = { 'Hadir': 'st-hadir', 'Sakit': 'st-sakit', 'Izin': 'st-izin', 'Alpa': 'st-alpa', '-': 'st-b' };
+        const escHtml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const inline = s =>
+            s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+        const rows = md.split('\n');
+        const out = [];
+        let i = 0;
+
+        while (i < rows.length) {
+            const line = rows[i];
+
+            if (line.startsWith('# ')) {
+                out.push(`<h1>${inline(escHtml(line.slice(2)))}</h1>`);
+                i++; continue;
+            }
+            if (line.startsWith('## ')) {
+                out.push(`<h2>${inline(escHtml(line.slice(3)))}</h2>`);
+                i++; continue;
+            }
+            if (line.startsWith('|') && i + 1 < rows.length && /^\|[\s:-|]+\|?$/.test(rows[i + 1])) {
+                const header = line.split('|').map(c => c.trim()).filter((c, idx, arr) => !(idx === 0 || idx === arr.length - 1) || c);
+                const headCells = header;
+                const dataCells = [];
+                i += 2;
+                while (i < rows.length && rows[i].startsWith('|')) {
+                    const parts = rows[i].split('|').map(c => c.trim());
+                    dataCells.push(parts.slice(1, -1));
+                    i++;
+                }
+                const ths = headCells.map(c => `<th>${inline(escHtml(c))}</th>`).join('');
+                const trs = dataCells.map(cells => {
+                    const tds = cells.map(c => {
+                        const clean = c.replace(/\*\*/g, '');
+                        const key = clean.trim();
+                        const badge = stCls[key];
+                        if (badge) return `<td class="text-center"><span class="st-badge ${badge}">${escHtml(key)}</span></td>`;
+                        return `<td>${inline(escHtml(c))}</td>`;
+                    }).join('');
+                    return `<tr>${tds}</tr>`;
+                }).join('');
+                out.push(`<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`);
+                continue;
+            }
+            if (line.startsWith('- ')) {
+                const items = [];
+                while (i < rows.length && rows[i].startsWith('- ')) {
+                    items.push(`<li>${inline(escHtml(rows[i].slice(2)))}</li>`);
+                    i++;
+                }
+                out.push(`<ul>${items.join('')}</ul>`);
+                continue;
+            }
+            if (line.trim() === '') { i++; continue; }
+            out.push(`<p>${inline(escHtml(line))}</p>`);
+            i++;
+        }
+        return out.join('');
+    }
+
+    function buildMd() {
+        const lines = [];
+        lines.push('# Rekap Absen Kehadiran');
+        lines.push('');
+        lines.push('**Tanggal:** ' + getTanggal());
+        lines.push('');
+        lines.push('| No | Nama | Status |');
+        lines.push('|----|------|--------|');
+
+        const tgl = getTanggal();
+        const rec = data.records[tgl] || {};
+        data.peserta.forEach((nama, i) => {
+            const st = rec[nama] ? STATUS[rec[nama]].label : '-';
+            const cleanNama = nama.replace(/\|/g, '').replace(/\n/g, ' ');
+            lines.push(`| ${i + 1} | ${cleanNama} | ${st} |`);
+        });
+
+        const counts = { hadir: 0, sakit: 0, izin: 0, alpa: 0, belum: 0 };
+        data.peserta.forEach(nama => {
+            const s = rec[nama];
+            if (s) counts[s]++;
+            else counts.belum++;
+        });
+
+        lines.push('');
+        lines.push('## Ringkasan');
+        lines.push('');
+        lines.push(`- Hadir: **${counts.hadir}**`);
+        lines.push(`- Sakit: **${counts.sakit}**`);
+        lines.push(`- Izin: **${counts.izin}**`);
+        lines.push(`- Alpa: **${counts.alpa}**`);
+        lines.push(`- Belum Absen: **${counts.belum}**`);
+        lines.push(`- Total: **${data.peserta.length}**`);
+        return lines.join('\n');
+    }
+
+    function buildAllMd() {
+        const lines = [];
+        lines.push('# Rekap Absen Kehadiran');
+        lines.push('');
+        lines.push('Semua tanggal:');
+        lines.push('');
+        const tanggals = Object.keys(data.records).sort();
+        if (tanggals.length === 0) {
+            lines.push('Belum ada data absen.');
+            return lines.join('\n');
+        }
+
+        tanggals.forEach(tgl => {
+            lines.push(`## ${tgl}`);
+            lines.push('');
+            lines.push('| No | Nama | Status |');
+            lines.push('|----|------|--------|');
+            const rec = data.records[tgl] || {};
+            data.peserta.forEach((nama, i) => {
+                const st = rec[nama] ? STATUS[rec[nama]].label : '-';
+                const cleanNama = nama.replace(/\|/g, '').replace(/\n/g, ' ');
+                lines.push(`| ${i + 1} | ${cleanNama} | ${st} |`);
+            });
+            lines.push('');
+        });
+        return lines.join('\n');
+    }
+
+    function downloadFile(content, filename) {
+        const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    let jenisExport = false;
+    let exportModal;
+
+    function openExport(semua) {
+        if (!exportModal) exportModal = new bootstrap.Modal(document.getElementById('modalExport'));
+        document.getElementById(semua ? 'jenisSemua' : 'jenisHariIni').checked = true;
+        ubahJenisExport(semua);
+        exportModal.show();
+    }
+
+    function ubahJenisExport(semua) {
+        jenisExport = semua;
+        const md = semua ? buildAllMd() : buildMd();
+        document.getElementById('previewExportRender').innerHTML = mdToHtml(md);
+        document.getElementById('namaFile').value =
+            semua ? 'rekap-absen-semua-tanggal' : 'rekap-absen-' + getTanggal();
+        renderChips(semua);
+    }
+
+    function renderChips(semua) {
+        const jumlahTanggal = semua ? Object.keys(data.records).length : 1;
+        const jumlahPeserta = data.peserta.length;
+        const jumlahStatus = semua
+            ? (Object.values(data.records).reduce((acc, r) => acc + Object.keys(r || {}).length, 0))
+            : Object.keys(data.records[getTanggal()] || {}).length;
+
+        const items = [
+            { icon: 'bi-calendar3', label: 'Tanggal', val: jumlahTanggal },
+            { icon: 'bi-people', label: 'Peserta', val: jumlahPeserta },
+            { icon: 'bi-check2-square', label: 'Status terisi', val: jumlahStatus }
+        ];
+        document.getElementById('chipsExport').innerHTML = items.map(c => `
+            <span class="badge text-bg-light border px-3 py-2">
+                <i class="bi ${c.icon} text-primary me-1"></i>${c.label}: <strong>${c.val}</strong>
+            </span>`).join('');
+    }
+
+    async function saveExport() {
+        const nama = document.getElementById('namaFile').value.trim() ||
+            (jenisExport ? 'rekap-absen-semua-tanggal' : 'rekap-absen-' + getTanggal());
+        const filename = /\.md$/i.test(nama) ? nama : nama + '.md';
+        const md = jenisExport ? buildAllMd() : buildMd();
+        try {
+            if (window.showSaveFilePicker) {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }]
+                });
+                const writable = await handle.createWritable();
+                await writable.write(md);
+                await writable.close();
+            } else {
+                downloadFile(md, filename);
+            }
+            exportModal.hide();
+            showToast('File ' + filename + ' berhasil disimpan!');
+        } catch (e) {
+            if (e.name !== 'AbortError') showToast('Gagal menyimpan file.');
+        }
+    }
+
+    render();
+</script>
+
+</body>
+</html>
