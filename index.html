@@ -84,6 +84,13 @@
             transition: all .2s ease; font-size: 1rem;
         }
         .btn-icon:hover { background: var(--surface-2); transform: translateY(-1px); }
+        .btn-icon-sm {
+            width: 32px; height: 32px; border-radius: .6rem;
+            border: 1px solid var(--border); background: var(--surface);
+            color: var(--text-2); display: inline-flex; align-items: center; justify-content: center;
+            transition: all .2s ease; font-size: .9rem;
+        }
+        .btn-icon-sm:hover { background: var(--soft); color: var(--soft-text); transform: translateY(-1px); }
         .pill-soft {
             background: var(--soft); color: var(--soft-text);
             font-weight: 600; border-radius: 2rem;
@@ -325,8 +332,15 @@
                         <div class="flex-grow-1">
                             <div class="small text-uppercase letter-spacing opacity-75 mb-2">Kehadiran</div>
                             <div class="d-flex align-items-center gap-2 mb-3">
-                                <i class="bi bi-calendar3 fs-5"></i>
-                                <input type="date" id="inputTanggal" class="form-control form-control-sm" onchange="render()">
+                                <button class="btn btn-glass btn-sm" onclick="geserTanggal(-1)" title="Tanggal sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                    <i class="bi bi-calendar3 fs-5"></i>
+                                    <input type="date" id="inputTanggal" class="form-control form-control-sm" onchange="render()">
+                                </div>
+                                <button class="btn btn-glass btn-sm" onclick="geserTanggal(1)" title="Tanggal berikutnya"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                            <div class="text-center mb-2">
+                                <button class="btn btn-link btn-sm text-white text-decoration-none opacity-75" onclick="keHariIni()"><i class="bi bi-arrow-repeat me-1"></i>Kembali ke hari ini</button>
                             </div>
                             <div class="btn-group w-100">
                                 <button class="btn btn-grad btn-sm" onclick="openExport(false)"><i class="bi bi-calendar-day me-1"></i>Rekap Hari Ini</button>
@@ -354,13 +368,26 @@
                         <input type="text" id="inputNama" class="form-control border-start-0" placeholder="Masukkan nama peserta..." onkeydown="if(event.key==='Enter')addPeserta()">
                         <button class="btn btn-grad" onclick="addPeserta()"><i class="bi bi-plus-lg me-1"></i>Tambah</button>
                     </div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-link btn-sm text-decoration-none" id="btnBulk" onclick="toggleBulk()"><i class="bi bi-list-ul me-1"></i>Tambah banyak sekaligus</button>
+                    </div>
+                    <div id="bulkBox" class="d-none mt-1">
+                        <textarea id="bulkNama" class="form-control mb-2" rows="3" placeholder="Satu nama per baris..."></textarea>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-grad btn-sm flex-grow-1" onclick="addBulk()"><i class="bi bi-plus-lg me-1"></i>Tambah Semua</button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('bulkBox').classList.add('d-none')">Batal</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-people-fill me-2"></i>Daftar Peserta</span>
-                    <span id="jumlahPeserta" class="pill-soft badge px-3 py-2"></span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="jumlahPeserta" class="pill-soft badge px-3 py-2"></span>
+                        <button class="btn btn-grad btn-sm" onclick="tandaiSemuaHadir()" title="Tandai semua peserta hadir hari ini"><i class="bi bi-check2-all me-1"></i>Semua Hadir</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="d-flex gap-2 mb-3">
@@ -401,11 +428,52 @@
             </div>
 
             <div class="card">
-                <div class="card-header"><i class="bi bi-eye-fill me-2"></i>Pratinjau Export .md</div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-eye-fill me-2"></i>Pratinjau Export .md</span>
+                    <div class="d-flex gap-1">
+                        <button class="btn-icon-sm" onclick="copyRekap()" title="Salin rekap ke clipboard"><i class="bi bi-clipboard"></i></button>
+                        <button class="btn-icon-sm" onclick="exportCsv()" title="Export CSV / Excel"><i class="bi bi-filetype-csv"></i></button>
+                        <button class="btn-icon-sm" onclick="printRekap()" title="Cetak / simpan PDF"><i class="bi bi-printer"></i></button>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div id="previewRender" class="preview-render mb-3"></div>
                     <button class="btn btn-grad w-100" onclick="openExport(false)"><i class="bi bi-file-earmark-arrow-down me-1"></i>Export Rekap Hari Ini</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rekap Bulanan -->
+    <div class="card mt-4">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span><i class="bi bi-calendar2-week me-2"></i>Rekap Bulanan</span>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <input type="month" id="inputBulan" class="form-control form-control-sm" style="width:170px" onchange="renderRekapBulanan()">
+                <button class="btn btn-outline-secondary btn-sm" onclick="exportCsv()"><i class="bi bi-filetype-csv me-1"></i>Export CSV</button>
+                <button class="btn btn-grad btn-sm" onclick="printRekap()"><i class="bi bi-printer me-1"></i>Print / PDF</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-head">
+                        <tr>
+                            <th>Nama</th>
+                            <th class="text-center">Hadir</th>
+                            <th class="text-center">Sakit</th>
+                            <th class="text-center">Izin</th>
+                            <th class="text-center">Alpa</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">% Hadir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyRekap"></tbody>
+                </table>
+            </div>
+            <div id="emptyRekap" class="empty-state text-center text-secondary d-none">
+                <i class="bi bi-calendar-x d-block mb-2"></i>
+                Belum ada data absen pada bulan ini.
             </div>
         </div>
     </div>
@@ -526,6 +594,16 @@
         return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
     }
 
+    function esc(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+    }
+
+    function inline(nama) {
+        return nama.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
     /* ---------- Tema ---------- */
     function initTema() {
         const saved = localStorage.getItem(TEMA_KEY);
@@ -578,7 +656,76 @@
         data = { peserta: [], records: {} };
         saveData();
         render();
+        renderRekapBulanan();
         showToast('Semua data dihapus.');
+    }
+
+    function toggleBulk() {
+        document.getElementById('bulkBox').classList.toggle('d-none');
+    }
+
+    function addBulk() {
+        const ta = document.getElementById('bulkNama');
+        const names = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+        let added = 0, skip = 0;
+        names.forEach(n => {
+            if (data.peserta.includes(n)) { skip++; return; }
+            data.peserta.push(n);
+            added++;
+        });
+        if (added === 0 && skip === 0) return;
+        saveData();
+        ta.value = '';
+        document.getElementById('bulkBox').classList.add('d-none');
+        render();
+        renderRekapBulanan();
+        showToast(`${added} peserta ditambahkan.${skip ? ' (' + skip + ' sudah ada)' : ''}`);
+    }
+
+    function tandaiSemuaHadir() {
+        const tgl = getTanggal();
+        if (!data.records[tgl]) data.records[tgl] = {};
+        data.peserta.forEach(n => { data.records[tgl][n] = 'hadir'; });
+        saveData();
+        render();
+        showToast('Semua peserta ditandai Hadir.');
+    }
+
+    function editPeserta(namaLama) {
+        const baru = prompt('Ubah nama peserta:', namaLama);
+        if (!baru) return;
+        const bersih = baru.trim();
+        if (!bersih || bersih === namaLama) return;
+        if (data.peserta.includes(bersih)) {
+            showToast('Nama sudah terdaftar!');
+            return;
+        }
+        const idx = data.peserta.indexOf(namaLama);
+        data.peserta[idx] = bersih;
+        Object.keys(data.records).forEach(tgl => {
+            const rec = data.records[tgl];
+            if (rec && rec[namaLama] !== undefined) {
+                rec[bersih] = rec[namaLama];
+                delete rec[namaLama];
+            }
+        });
+        saveData();
+        render();
+        renderRekapBulanan();
+        showToast('Nama peserta diubah.');
+    }
+
+    function geserTanggal(selisih) {
+        const [y, m, d] = getTanggal().split('-').map(Number);
+        const dt = new Date(y, m - 1, d + selisih);
+        const p = n => String(n).padStart(2, '0');
+        document.getElementById('inputTanggal').value = `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`;
+        render();
+    }
+
+    function keHariIni() {
+        document.getElementById('inputTanggal').value = tanggalHariIni();
+        render();
     }
 
     function setStatus(nama, status) {
@@ -636,11 +783,12 @@
             });
             tr.appendChild(tdStatus);
 
-            const tdHapus = document.createElement('td');
-            tdHapus.className = 'text-center';
-            tdHapus.innerHTML = `<button class="btn-hapus px-2 py-1" title="Hapus"><i class="bi bi-trash3"></i></button>`;
-            tdHapus.firstChild.onclick = () => hapusPeserta(nama);
-            tr.appendChild(tdHapus);
+            const tdAksi = document.createElement('td');
+            tdAksi.className = 'text-center';
+            tdAksi.innerHTML = `
+                <button class="btn-hapus px-2 py-1 me-1" title="Ubah nama" onclick="editPeserta('${inline(nama)}')"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn-hapus px-2 py-1" title="Hapus" onclick="hapusPeserta('${inline(nama)}')"><i class="bi bi-trash3"></i></button>`;
+            tr.appendChild(tdAksi);
 
             tbody.appendChild(tr);
         });
@@ -648,6 +796,7 @@
         empty.classList.toggle('d-none', daftar.length > 0);
         renderStat(rec);
         document.getElementById('previewRender').innerHTML = mdToHtml(buildMd());
+        renderRekapBulanan();
     }
 
     function renderStat(rec) {
@@ -877,8 +1026,121 @@
         }
     }
 
+    /* ---------- Aksi cepat ---------- */
+    function copyRekap() {
+        navigator.clipboard.writeText(buildMd())
+            .then(() => showToast('Rekap disalin ke clipboard!'))
+            .catch(() => showToast('Gagal menyalin.'));
+    }
+
+    function exportCsv() {
+        if (data.peserta.length === 0) {
+            showToast('Belum ada peserta.');
+            return;
+        }
+        const rows = [['Tanggal', 'Nama', 'Status']];
+        Object.keys(data.records).sort().forEach(tgl => {
+            const rec = data.records[tgl] || {};
+            data.peserta.forEach(n => {
+                rows.push([tgl, n, rec[n] ? STATUS[rec[n]].label : '']);
+            });
+        });
+        const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+        downloadFile('\ufeff' + csv, 'rekap-absen.csv');
+        showToast('File CSV berhasil diunduh.');
+    }
+
+    function rekapBulanan(bulan) {
+        const tglDalamBulan = Object.keys(data.records).filter(t => t.startsWith(bulan)).sort();
+        const rows = [];
+        data.peserta.forEach(nama => {
+            const c = { hadir: 0, sakit: 0, izin: 0, alpa: 0 };
+            let total = 0;
+            tglDalamBulan.forEach(t => {
+                const s = data.records[t][nama];
+                if (s) { c[s]++; total++; }
+            });
+            const pct = total ? Math.round((c.hadir / total) * 100) : 0;
+            rows.push({ nama, ...c, total, pct });
+        });
+        return { tglList: tglDalamBulan, rows };
+    }
+
+    function renderRekapBulanan() {
+        const bulan = document.getElementById('inputBulan').value;
+        const { rows } = rekapBulanan(bulan);
+        const tbody = document.getElementById('tbodyRekap');
+        const empty = document.getElementById('emptyRekap');
+
+        tbody.innerHTML = '';
+        let adaData = false;
+        rows.forEach(r => {
+            if (r.total > 0) adaData = true;
+            const pctCls = r.pct >= 90 ? 'st-hadir' : r.pct >= 75 ? 'st-izin' : r.pct > 0 ? 'st-sakit' : 'st-b';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><div class="d-flex align-items-center gap-2">
+                    <span class="avatar">${inisial(r.nama)}</span>
+                    <span class="fw-semibold">${esc(r.nama)}</span>
+                </div></td>
+                <td class="text-center">${r.hadir}</td>
+                <td class="text-center">${r.sakit}</td>
+                <td class="text-center">${r.izin}</td>
+                <td class="text-center">${r.alpa}</td>
+                <td class="text-center fw-bold">${r.total}</td>
+                <td class="text-center"><span class="st-badge ${pctCls}">${r.pct}%</span></td>`;
+            tbody.appendChild(tr);
+        });
+
+        const totalSemua = rows.reduce((a, r) => a + r.total, 0);
+        empty.classList.toggle('d-none', totalSemua > 0 || rows.length === 0);
+    }
+
+    function printRekap() {
+        const bulan = document.getElementById('inputBulan').value;
+        const [y, m] = bulan.split('-').map(Number);
+        const namaBulan = `${BULAN[m - 1]} ${y}`;
+        const { rows } = rekapBulanan(bulan);
+
+        const style = `
+            body{font-family:'Segoe UI',Arial,sans-serif;padding:28px;color:#111}
+            h1{font-size:20px;margin:0 0 4px}
+            p{margin:0 0 16px;color:#555}
+            table{width:100%;border-collapse:collapse}
+            th,td{border:1px solid #ccc;padding:7px 9px;font-size:12.5px;text-align:center}
+            th{background:#f1f2f8;text-align:left}
+            td:first-child,th:first-child{text-align:left}
+            .hd{color:#059669}.sk{color:#d97706}.iz{color:#2563eb}.al{color:#dc2626}
+        `;
+
+        let html = `<html><head><title>Rekap Absen - ${namaBulan}</title><style>${style}</style></head><body>`;
+        html += `<h1>Rekap Absen Kehadiran</h1>`;
+        html += `<p>Bulan: <strong>${namaBulan}</strong> &nbsp;|&nbsp; Total hari absen: <strong>${Object.keys(data.records).filter(t => t.startsWith(bulan)).length}</strong></p>`;
+        html += `<table><thead><tr>
+            <th>Nama</th><th>Hadir</th><th>Sakit</th><th>Izin</th><th>Alpa</th><th>Total</th><th>% Hadir</th>
+        </tr></thead><tbody>`;
+        rows.forEach(r => {
+            const cls = r.pct >= 90 ? 'hd' : r.pct >= 75 ? 'iz' : r.pct > 0 ? 'sk' : 'al';
+            html += `<tr>
+                <td>${esc(r.nama)}</td>
+                <td>${r.hadir}</td><td>${r.sakit}</td><td>${r.izin}</td><td>${r.alpa}</td>
+                <td>${r.total}</td><td class="${cls}">${r.pct}%</td>
+            </tr>`;
+        });
+        html += '</tbody></table></body></html>';
+
+        const w = window.open('', '_blank');
+        if (!w) return;
+        w.document.write(html);
+        w.document.close();
+        w.focus();
+        w.print();
+    }
+
     initTema();
+    document.getElementById('inputBulan').value = tanggalHariIni().slice(0, 7);
     render();
+    renderRekapBulanan();
 </script>
 
 </body>
