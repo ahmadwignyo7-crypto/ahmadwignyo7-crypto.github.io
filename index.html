@@ -269,8 +269,61 @@
             display: inline-flex; align-items: center; gap: .35rem;
         }
         .chip i { color: var(--accent); }
-        .toast { background: var(--accent); color: #fff; border: none; }
+        /* ---------- Toast ---------- */
+        .toast {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff; border: none; border-radius: 1rem;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, .35);
+        }
+        .toast .toast-body { font-weight: 600; font-size: .9rem; padding: .85rem 1rem; }
+        .toast .toast-body i {
+            background: rgba(255,255,255,.2);
+            width: 26px; height: 26px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
         .toast .btn-close { filter: invert(1); }
+
+        /* ---------- Dialog Kustom ---------- */
+        .dialog-backdrop {
+            position: fixed; inset: 0; z-index: 1060;
+            background: rgba(15, 23, 42, .55);
+            backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+            opacity: 0; pointer-events: none;
+            transition: opacity .25s ease;
+        }
+        .dialog-backdrop.show { opacity: 1; pointer-events: auto; }
+        .dialog-box {
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 1.4rem; width: 100%; max-width: 420px;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, .35);
+            transform: translateY(18px) scale(.95);
+            transition: transform .28s cubic-bezier(.34, 1.35, .64, 1);
+            overflow: hidden;
+        }
+        .dialog-backdrop.show .dialog-box { transform: none; }
+        .dialog-ic {
+            width: 64px; height: 64px; border-radius: 1.2rem;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
+        }
+        .dialog-title { font-weight: 800; }
+        .dialog-text { color: var(--text-2); font-size: .92rem; }
+        .dialog-footer {
+            background: var(--surface-2);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: center; gap: .5rem;
+            padding: .9rem 1.25rem;
+        }
+        .ic-danger { background:#fee2e2; color:#dc2626; }
+        .ic-warn   { background:#fef3c7; color:#d97706; }
+        .ic-info   { background:#dbeafe; color:#2563eb; }
+        [data-theme="dark"] .ic-danger { background: rgba(220,38,38,.18); color:#fca5a5; }
+        [data-theme="dark"] .ic-warn   { background: rgba(217,119,6,.18);  color:#fcd34d; }
+        [data-theme="dark"] .ic-info   { background: rgba(37,99,235,.22);  color:#93c5fd; }
     </style>
 </head>
 <body>
@@ -507,6 +560,26 @@
     </div>
 </div>
 
+<!-- Dialog Kustom -->
+<div class="dialog-backdrop" id="dlg">
+    <div class="dialog-box">
+        <div class="p-4 text-center position-relative">
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" id="dlgClose" aria-label="Tutup"></button>
+            <div class="dialog-ic mb-3" id="dlgIcon"><i class="bi bi-info-circle"></i></div>
+            <h5 class="dialog-title mb-2" id="dlgTitle">Judul</h5>
+            <p class="dialog-text mb-0" id="dlgText">Pesan</p>
+            <div class="text-start mt-3 d-none" id="dlgInputWrap">
+                <label class="form-label small fw-semibold text-secondary mb-1" id="dlgInputLabel">Teks</label>
+                <input type="text" class="form-control" id="dlgInput" placeholder="Ketik di sini...">
+            </div>
+        </div>
+        <div class="dialog-footer">
+            <button class="btn btn-outline-secondary px-4" id="dlgCancel"><i class="bi bi-x-lg me-1"></i>Batal</button>
+            <button class="btn btn-grad px-4" id="dlgOk"><i class="bi bi-check2 me-1"></i>Oke</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="toast" class="toast align-items-center border-0" role="alert">
         <div class="d-flex">
@@ -574,6 +647,90 @@
         toast.show();
     }
 
+    /* ---------- Dialog Kustom ---------- */
+    function dialogConfirm(o) {
+        return openDialog({
+            title: o.title,
+            text: o.text || '',
+            icon: o.icon || 'bi-question-circle',
+            icClass: o.icClass || 'ic-info',
+            btnText: o.btnText || 'Oke',
+            btnClass: o.btnClass || 'btn-grad',
+            btnIcon: o.btnIcon || 'bi-check2'
+        });
+    }
+
+    function dialogPrompt(o) {
+        return openDialog({
+            title: o.title,
+            text: o.text || '',
+            icon: o.icon || 'bi-pencil-square',
+            icClass: o.icClass || 'ic-info',
+            btnText: o.btnText || 'Simpan',
+            btnClass: o.btnClass || 'btn-grad',
+            btnIcon: o.btnIcon || 'bi-check2',
+            prompt: true,
+            value: o.value || '',
+            placeholder: o.placeholder || '',
+            inputLabel: o.inputLabel || 'Masukkan teks'
+        });
+    }
+
+    function openDialog(opts) {
+        const wrap = document.getElementById('dlg');
+        const icon = document.getElementById('dlgIcon');
+        icon.className = 'dialog-ic ' + (opts.icClass || 'ic-info');
+        icon.innerHTML = `<i class="bi ${opts.icon || 'bi-info-circle'}"></i>`;
+        document.getElementById('dlgTitle').textContent = opts.title || '';
+        document.getElementById('dlgText').innerHTML = opts.text || '';
+
+        const wrapInput = document.getElementById('dlgInputWrap');
+        const input = document.getElementById('dlgInput');
+        if (opts.prompt) {
+            wrapInput.classList.remove('d-none');
+            input.value = opts.value || '';
+            input.placeholder = opts.placeholder || '';
+            input.classList.remove('is-invalid');
+            document.getElementById('dlgInputLabel').textContent = opts.inputLabel || '';
+        } else {
+            wrapInput.classList.add('d-none');
+        }
+
+        const ok = document.getElementById('dlgOk');
+        ok.className = 'btn px-4 ' + (opts.btnClass || 'btn-grad');
+        ok.innerHTML = `<i class="bi ${opts.btnIcon || 'bi-check2'} me-1"></i>` + (opts.btnText || 'Oke');
+        const cancel = document.getElementById('dlgCancel');
+        cancel.innerHTML = '<i class="bi bi-x-lg me-1"></i>' + (opts.cancelText || 'Batal');
+
+        wrap.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        if (opts.prompt) setTimeout(() => { input.focus(); input.select(); }, 220);
+
+        return new Promise(resolve => {
+            ok.onclick = () => {
+                if (opts.prompt && !input.value.trim()) {
+                    input.classList.add('is-invalid');
+                    input.focus();
+                    return;
+                }
+                closeDialog(wrap);
+                resolve(opts.prompt ? input.value.trim() : true);
+            };
+            cancel.onclick = () => { closeDialog(wrap); resolve(false); };
+            document.getElementById('dlgClose').onclick = () => { closeDialog(wrap); resolve(false); };
+            wrap.onclick = e => { if (e.target === wrap) { closeDialog(wrap); resolve(false); } };
+            input.onkeydown = e => {
+                if (e.key === 'Enter') ok.click();
+                else input.classList.remove('is-invalid');
+            };
+        });
+    }
+
+    function closeDialog(wrap) {
+        wrap.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
     function inisial(nama) {
         const parts = nama.trim().split(/\s+/);
         return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
@@ -625,8 +782,17 @@
         showToast(`"${nama}" berhasil ditambahkan.`);
     }
 
-    function hapusPeserta(nama) {
-        if (!confirm(`Hapus peserta "${nama}"?`)) return;
+    async function hapusPeserta(nama) {
+        const ok = await dialogConfirm({
+            title: 'Hapus Peserta',
+            text: `Yakin ingin menghapus <strong>${esc(nama)}</strong> dari daftar? Data absen yang sudah tercatat akan ikut terhapus.`,
+            btnText: 'Ya, Hapus',
+            btnClass: 'btn-danger',
+            btnIcon: 'bi-trash3-fill',
+            icClass: 'ic-danger',
+            icon: 'bi-trash3'
+        });
+        if (!ok) return;
         data.peserta = data.peserta.filter(n => n !== nama);
         Object.keys(data.records).forEach(tgl => {
             if (data.records[tgl]) delete data.records[tgl][nama];
@@ -636,8 +802,17 @@
         showToast(`"${nama}" dihapus.`);
     }
 
-    function resetData() {
-        if (!confirm('Hapus semua peserta & data absen? Tindakan ini tidak bisa dibatalkan.')) return;
+    async function resetData() {
+        const ok = await dialogConfirm({
+            title: 'Reset Semua Data',
+            text: 'Seluruh peserta &amp; riwayat absen akan dihapus permanen. Tindakan ini <strong>tidak bisa dibatalkan</strong>.',
+            btnText: 'Reset Semua',
+            btnClass: 'btn-danger',
+            btnIcon: 'bi-arrow-counterclockwise',
+            icClass: 'ic-warn',
+            icon: 'bi-exclamation-triangle'
+        });
+        if (!ok) return;
         data = { peserta: [], records: {} };
         saveData();
         render();
@@ -676,8 +851,16 @@
         showToast('Semua peserta ditandai Hadir.');
     }
 
-    function editPeserta(namaLama) {
-        const baru = prompt('Ubah nama peserta:', namaLama);
+    async function editPeserta(namaLama) {
+        const baru = await dialogPrompt({
+            title: 'Ubah Nama Peserta',
+            text: `Masukkan nama baru untuk <strong>${esc(namaLama)}</strong>.`,
+            value: namaLama,
+            placeholder: 'Nama baru...',
+            inputLabel: 'Nama peserta',
+            btnText: 'Simpan',
+            btnIcon: 'bi-check2'
+        });
         if (!baru) return;
         const bersih = baru.trim();
         if (!bersih || bersih === namaLama) return;

@@ -226,8 +226,60 @@
             transition: all .15s ease; border-radius: .5rem;
         }
         .btn-hapus:hover { color:#dc2626; background:#fee2e2; }
-        .toast { background: var(--accent); color: #fff; border: none; }
+        .toast {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff; border: none; border-radius: 1rem;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, .35);
+        }
+        .toast .toast-body { font-weight: 600; font-size: .9rem; padding: .85rem 1rem; }
+        .toast .toast-body i {
+            background: rgba(255,255,255,.2);
+            width: 26px; height: 26px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
         .toast .btn-close { filter: invert(1); }
+
+        /* ---------- Dialog Kustom ---------- */
+        .dialog-backdrop {
+            position: fixed; inset: 0; z-index: 1060;
+            background: rgba(15, 23, 42, .55);
+            backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+            opacity: 0; pointer-events: none;
+            transition: opacity .25s ease;
+        }
+        .dialog-backdrop.show { opacity: 1; pointer-events: auto; }
+        .dialog-box {
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 1.4rem; width: 100%; max-width: 420px;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, .35);
+            transform: translateY(18px) scale(.95);
+            transition: transform .28s cubic-bezier(.34, 1.35, .64, 1);
+            overflow: hidden;
+        }
+        .dialog-backdrop.show .dialog-box { transform: none; }
+        .dialog-ic {
+            width: 64px; height: 64px; border-radius: 1.2rem;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
+        }
+        .dialog-title { font-weight: 800; }
+        .dialog-text { color: var(--text-2); font-size: .92rem; }
+        .dialog-footer {
+            background: var(--surface-2);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: center; gap: .5rem;
+            padding: .9rem 1.25rem;
+        }
+        .ic-danger { background:#fee2e2; color:#dc2626; }
+        .ic-warn   { background:#fef3c7; color:#d97706; }
+        .ic-info   { background:#dbeafe; color:#2563eb; }
+        [data-theme="dark"] .ic-danger { background: rgba(220,38,38,.18); color:#fca5a5; }
+        [data-theme="dark"] .ic-warn   { background: rgba(217,119,6,.18);  color:#fcd34d; }
+        [data-theme="dark"] .ic-info   { background: rgba(37,99,235,.22);  color:#93c5fd; }
     </style>
 </head>
 <body>
@@ -334,6 +386,22 @@
     </div>
 </div>
 
+<!-- Dialog Kustom -->
+<div class="dialog-backdrop" id="dlg">
+    <div class="dialog-box">
+        <div class="p-4 text-center position-relative">
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" id="dlgClose" aria-label="Tutup"></button>
+            <div class="dialog-ic mb-3" id="dlgIcon"><i class="bi bi-info-circle"></i></div>
+            <h5 class="dialog-title mb-2" id="dlgTitle">Judul</h5>
+            <p class="dialog-text mb-0" id="dlgText">Pesan</p>
+        </div>
+        <div class="dialog-footer">
+            <button class="btn btn-outline-secondary px-4" id="dlgCancel"><i class="bi bi-x-lg me-1"></i>Batal</button>
+            <button class="btn btn-grad px-4" id="dlgOk"><i class="bi bi-check2 me-1"></i>Oke</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="toast" class="toast align-items-center border-0" role="alert">
         <div class="d-flex">
@@ -377,6 +445,49 @@
         const el = document.getElementById('toast');
         document.getElementById('toastBody').textContent = msg;
         new bootstrap.Toast(el, { delay: 1800 }).show();
+    }
+
+    /* ---------- Dialog Kustom ---------- */
+    function dialogConfirm(o) {
+        return openDialog({
+            title: o.title,
+            text: o.text || '',
+            icon: o.icon || 'bi-question-circle',
+            icClass: o.icClass || 'ic-info',
+            btnText: o.btnText || 'Oke',
+            btnClass: o.btnClass || 'btn-grad',
+            btnIcon: o.btnIcon || 'bi-check2'
+        });
+    }
+
+    function openDialog(opts) {
+        const wrap = document.getElementById('dlg');
+        const icon = document.getElementById('dlgIcon');
+        icon.className = 'dialog-ic ' + (opts.icClass || 'ic-info');
+        icon.innerHTML = `<i class="bi ${opts.icon || 'bi-info-circle'}"></i>`;
+        document.getElementById('dlgTitle').textContent = opts.title || '';
+        document.getElementById('dlgText').innerHTML = opts.text || '';
+
+        const ok = document.getElementById('dlgOk');
+        ok.className = 'btn px-4 ' + (opts.btnClass || 'btn-grad');
+        ok.innerHTML = `<i class="bi ${opts.btnIcon || 'bi-check2'} me-1"></i>` + (opts.btnText || 'Oke');
+        const cancel = document.getElementById('dlgCancel');
+        cancel.innerHTML = '<i class="bi bi-x-lg me-1"></i>' + (opts.cancelText || 'Batal');
+
+        wrap.classList.add('show');
+        document.body.style.overflow = 'hidden';
+
+        return new Promise(resolve => {
+            ok.onclick = () => { closeDialog(wrap); resolve(true); };
+            cancel.onclick = () => { closeDialog(wrap); resolve(false); };
+            document.getElementById('dlgClose').onclick = () => { closeDialog(wrap); resolve(false); };
+            wrap.onclick = e => { if (e.target === wrap) { closeDialog(wrap); resolve(false); } };
+        });
+    }
+
+    function closeDialog(wrap) {
+        wrap.classList.remove('show');
+        document.body.style.overflow = '';
     }
 
     function tanggalHariIni() {
@@ -522,16 +633,34 @@
         renderTabel();
     }
 
-    function hapusTgl(iso) {
-        if (!confirm(`Hapus SEMUA data absen pada ${formatTanggal(iso)}? Tindakan ini tidak bisa dibatalkan.`)) return;
+    async function hapusTgl(iso) {
+        const ok = await dialogConfirm({
+            title: 'Hapus Data Tanggal',
+            text: `Semua data absen pada <strong>${formatTanggal(iso)}</strong> akan dihapus permanen. Tindakan ini <strong>tidak bisa dibatalkan</strong>.`,
+            btnText: 'Ya, Hapus',
+            btnClass: 'btn-danger',
+            btnIcon: 'bi-trash3-fill',
+            icClass: 'ic-danger',
+            icon: 'bi-calendar-x'
+        });
+        if (!ok) return;
         delete data.records[iso];
         saveData();
         render();
         showToast('Data absen tanggal tersebut dihapus.');
     }
 
-    function hapusAbsen(tgl, nama) {
-        if (!confirm(`Hapus absen "${nama}" pada ${formatTanggal(tgl)}?`)) return;
+    async function hapusAbsen(tgl, nama) {
+        const ok = await dialogConfirm({
+            title: 'Hapus Absen',
+            text: `Hapus absen <strong>${esc(nama)}</strong> pada <strong>${formatTanggal(tgl)}</strong>?`,
+            btnText: 'Ya, Hapus',
+            btnClass: 'btn-danger',
+            btnIcon: 'bi-trash3-fill',
+            icClass: 'ic-danger',
+            icon: 'bi-x-circle'
+        });
+        if (!ok) return;
         if (data.records[tgl]) delete data.records[tgl][nama];
         saveData();
         render();
